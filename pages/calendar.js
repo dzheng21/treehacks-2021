@@ -2,16 +2,19 @@ import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import Select, { components } from 'react-select'
 import { get } from 'http';
+import { Button } from '@material-ui/core';
+import Link from 'next/link';
+import axios from 'axios';
 
-
+import { GOOGLE_API_KEY, CALENDAR_ID } from '../secret/google-calendar-assets.json';
 
 export default class extends React.Component {
     static async getInitialProps({ req }) {
-        let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=964");
-        response = await response.json();
-        let pokemonNames = response.results;
-        let pokemonList = pokemonNames.map(e => ({ label: e.name, value: e.url }));
-        return { pokemonList: pokemonList }
+        const response = await axios.get(`https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?key=${GOOGLE_API_KEY}`)
+        console.log("asdadsf" + response.data.items + " __ " + response.data.items[0] + " ****" + response.data.kind);
+        const events = response.data.items;
+        let eventList = events.map(e => ({ label: e.summary, value: e.description }));
+        return { eventList: eventList }
     }
 
     constructor(props) {
@@ -19,7 +22,7 @@ export default class extends React.Component {
         this.state = { data: {}, images: {}, value: [] };
     }
     onChange(value) {
-        this.setState({value: value});
+        this.setState({ value: value });
     }
 
     render() {
@@ -49,6 +52,7 @@ export default class extends React.Component {
         };
         return (
             <div>
+                <Link href='/'><Button color="primary"><a>Back</a></Button></Link>
                 <Select
                     closeMenuOnSelect={false}
                     defaultValue={[]}
@@ -60,6 +64,7 @@ export default class extends React.Component {
                     options={this.props.pokemonList}
                 />
                 Hello World
+
         {/* <table>{this.props.pokemonList.map(pokemon =>
                     <tr key={pokemon.name}>
                         <td>{pokemon.name}</td>
